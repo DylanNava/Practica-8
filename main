@@ -1,0 +1,231 @@
+#include <iostream>
+
+using namespace std;
+
+template<class T>
+class Cola;
+
+template<class T>
+class node{
+private:
+    T data;
+    node<T>* sig;
+public:
+    node():sig(nullptr){};
+    friend class Cola<T>;
+};
+
+template<class T>
+class Cola{
+private:
+    node<T>* lista;
+    node<T>* ultimo()const;
+    node<T>* primero()const;
+    node<T>* anterior(node<T>* pos)const;
+    void insertar(node<T>* pos, T elem);
+    bool eliminar(node<T>* pos);
+public:
+    Cola():lista(nullptr){};
+    bool vacia()const;
+    void imprimir()const;
+    void Enqueue(T elem);
+    void Dequeue();
+    T Front();
+};
+
+template<class T>
+T Cola<T>::Front(){
+    if(!vacia()){
+       return primero()->data;
+    }
+}
+
+template<class T>
+void Cola<T>::Dequeue(){
+    eliminar(primero());
+}
+
+template<class T>
+void Cola<T>::Enqueue(T elem){
+    insertar(ultimo(),elem);
+}
+
+template<class T>
+void Cola<T>::imprimir()const{
+    node<T>* aux=lista;
+    while(aux!=nullptr){
+        std::cout<<aux->data<<"-> ";
+        aux=aux->sig;
+    }
+}
+
+template<class T>
+bool Cola<T>::eliminar(node<T>* pos){
+    if(vacia() || pos==nullptr){
+        return false;
+    }
+    if(pos==lista){
+        lista=lista->sig;
+    }
+    else{
+        anterior(pos)->sig=pos->sig;
+    }
+    delete pos;
+    return true;
+}
+
+template<class T>
+void Cola<T>::insertar(node<T>* pos, T elem){
+    node<T>* aux= new node<T>;
+    aux->data=elem;
+    if(pos==nullptr){
+        aux->sig=lista;
+        lista=aux;
+    }
+    else{
+        aux->sig=pos->sig;
+        pos->sig=aux;
+    }
+}
+
+template<class T>
+node<T>* Cola<T>::anterior(node<T>* pos)const{
+    if(vacia() || pos==nullptr){
+        return nullptr;
+    }
+    node<T>* aux=lista;
+    while(aux!=nullptr && aux->sig!=pos){
+        aux=aux->sig;
+    }
+    return aux;
+}
+
+template<class T>
+node<T>* Cola<T>::primero()const{
+    if(vacia()){
+        return nullptr;
+    }
+    return lista;
+}
+
+
+template<class T>
+node<T>* Cola<T>::ultimo()const{
+    if(vacia()){
+        return nullptr;
+    }
+    node<T>* aux=lista;
+    while(aux->sig!=nullptr){
+        aux=aux->sig;
+    }
+    return aux;
+}
+
+template<class T>
+bool Cola<T>::vacia()const{
+    if(lista==nullptr)
+        return true;
+    return false;
+}
+
+
+class Alumno{
+public:
+    string nombre;
+    string carrera;
+    int materiasAprobadas;
+    double promedio;
+
+bool operator==(const Alumno& other) const {
+    return this->nombre == other.nombre;
+}
+bool operator<=(const Alumno& other) const {
+    return this->nombre <= other.nombre;
+}
+bool operator>=(const Alumno& other) const {
+    return this->nombre >= other.nombre;
+}
+bool operator<(const Alumno& other) const {
+    return this->nombre < other.nombre;
+}
+bool operator>(const Alumno& other) const {
+    return this->nombre > other.nombre;
+}
+
+friend ostream& operator<<(ostream& os, const Alumno& s) {
+    os << "Nombre del alumno: " << s.nombre << endl;
+    os << "Carrera: " << s.carrera << endl;
+    os << "Materias aprobadas: " << s.materiasAprobadas << endl;
+    os << "Promedio: " << s.promedio << endl;
+    return os;
+}
+friend istream& operator>>(istream& is, Alumno& s) {
+    cout << "Ingrese el nombre del alumno: ";
+    is >> s.nombre;
+    cout << "Ingrese la carrera del alumno: ";
+    is >> s.carrera;
+    cout << "Ingrese las materias aprobadas por el alumno: ";
+    is >> s.materiasAprobadas;
+    cout << "Ingrese el promedio general obtenido: ";
+    is >> s.promedio;
+    cout << "------------------------"<<endl;
+    is.ignore();
+    return is;
+}
+
+};
+
+void altaSolicitud(Cola<Alumno>& Solicitudes) {
+    Alumno nuevoAlumno;
+    system("cls");
+    cin >> nuevoAlumno;
+    Solicitudes.Enqueue(nuevoAlumno);
+    cout << "Solicitud de constancia de estudio agregada correctamente.\n";
+    system("pause");
+}
+
+void elaborarConstancia(Cola<Alumno>& Solicitudes) {
+    system("cls");
+    if (Solicitudes.vacia()) {
+        cout << "No hay solicitudes de constancia en espera.\n";
+
+    }else{
+        Alumno alumnoAtender = Solicitudes.Front();
+        cout << alumnoAtender;
+        Solicitudes.Dequeue();
+        cout << "Solicitud de constancia atendida y eliminada correctamente.";
+        system("pause");
+    }
+}
+
+int main() {
+    Cola<Alumno> Solicitudes;
+
+    int opcion = 0;
+
+    while (opcion != 3) {
+            system("cls");
+            cout << "Menú de opciones\n";
+            cout << "1. Dar de alta una solicitud de constancia"<<endl;
+            cout << "2. Elaborar una constancia"<<endl;
+            cout << "3. Salir"<<endl;
+            cout << "Seleccione una opción: ";
+            cin >> opcion;
+            cin.ignore();
+            switch (opcion) {
+                case 1:
+                    altaSolicitud(Solicitudes);
+                    break;
+                case 2:
+                    elaborarConstancia(Solicitudes);
+                    break;
+                case 3:
+                    cout << "Saliendo del programa...\n";
+                    break;
+                default:
+                    cout << "Opción inválida. Intente de nuevo.\n";
+            }
+        cout << endl;
+    }
+    return 0;
+}
